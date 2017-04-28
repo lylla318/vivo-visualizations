@@ -1,0 +1,237 @@
+ <html>
+ <head>
+  <script src="https://d3js.org/d3.v3.min.js"></script>
+  <script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script> 
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="src/list.js"></script>
+  <script src="src/nouislider.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/nouislider.min.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="stylesheet" type="text/css" href="css/newStyle.css">  
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.16.6/lodash.min.js"></script>
+<script src="lib/d3.js"></script>
+</head>
+<body>
+
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="panel-group" id="accordion">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                <span class="start">Filter by:</span> Person
+              </a>
+            </h4>
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse">
+            <div class="panel-body" id="person">
+              <input type="text" class="form-control" id="testInput" placeholder="Search">
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+               <span class="start">Filter by:</span> Department
+             </a>
+           </h4>
+         </div>
+         <div id="collapseTwo" class="panel-collapse collapse">
+          <div class="panel-body" id="department">
+           <input type="text" class="form-control" id="deptInput" placeholder="Search">
+
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
+             <span class="start">Filter by:</span> Funding Agency
+           </a>
+         </h4>
+       </div>
+       <div id="collapseFour" class="panel-collapse collapse">
+        <div class="panel-body" id="funagen">
+           <input type="text" class="form-control" id="fundingInput" placeholder="Search">
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+            <span class="start">Filter by:</span> Active Year
+          </a>
+        </h4>
+      </div>
+      <div id="collapseThree" class="panel-collapse collapse">
+        <div class="panel-body" id="date">
+          <div id="range"></div>
+        </div>
+      </div>
+    </div>
+      <div>
+      <h5><a onclick="checkAll()">Check All</a> | <a onclick="uncheckAll()">Uncheck All</a></h5>
+      </div>
+  </div> 
+
+
+
+  <div id="legendDiv" class="center-block">
+
+
+  </div>
+</div>
+<div class="col-md-8">
+   <span class="glyphicon glyphicon-info-sign pull-right" 
+                      data-toggle="ttip"
+                      data-original-title="The keyword cloud presents the top 300 keywords extracted from the journal articles published by the Cornell faculty and researchers. <br> The size of each keyword in the cloud is directly proportional to the sum of the count of the faculty/researchers. <br> Bigger the keyword in size is, more the faculty members and researcher used the term in their papers."
+                      data-placement="bottom"
+                      data-html="true" 
+                      data-viewport="#site_wordcloud_vis">
+                    </span>
+  <div id="vis">
+  </div>
+</div>
+</div>
+
+
+<script>
+
+  var currentRange = [];
+  var removedNames = []; 
+
+  d3.json("data/grants.json", function(data){
+   update(data);
+   raw = data;
+   currentData = raw.map(function(node){
+    node["peopleList"] = node.people.map(d=>d.name); 
+    return node;
+   }); 
+   grants = data;
+
+
+
+      
+      var people = getNameList(grants);
+      addList("#person", people, "Person"); 
+
+      var departments = _.uniq(getDeptList(grants));
+      addList("#department", departments, "Department");
+
+      var agencies = getFundingAgency(grants); 
+      addList("#funagen", agencies, "Funding Agency")
+ 
+
+      var minYear = d3.min(grants, d=>Number(d.Start)); 
+      var maxYear = d3.max(grants, d=>Number(d.End)); 
+
+      currentRange  = [minYear, maxYear];
+
+      var range = document.getElementById('range');
+      noUiSlider.create(range, {
+          start: [ minYear, maxYear], // Handle start position
+          connect: true, // Display a colored bar between the handles
+          step: 1, 
+          tooltips: true,
+          format: {
+            to: function ( value ) {
+              return value;
+            },
+            from: function ( value ) {
+              return value;
+            }}, 
+          range: { // Slider can select '0' to '100'
+          'min': minYear,
+          'max': maxYear
+        }, 
+        pips: {
+          mode: 'values',
+          values: [minYear, maxYear], 
+          density: 75
+        }
+      });
+
+
+      range.noUiSlider.on("change", function(values, handle){
+
+        currentData = currentData.filter(function(d){
+          if((d.Start >= values[0] && d.Start <= values[1])||(d.End <= values[1] && d.End >= values[0])){ 
+            return true;
+          }
+          else{
+            dateFiltered.push(d);
+            return false; 
+          }
+        });
+
+
+        if ((values[0] < currentRange[0]) || (values[1] > currentRange[1])){
+
+
+          dateFiltered = dateFiltered.filter(function(d){
+            if((d.Start >= values[0] && d.Start <= values[1])||(d.End <= values[1] && d.End >= values[0])){
+             dateComeback.push(d);
+             return false; 
+           }
+           else{
+             return true;
+           }
+
+         }); 
+        }
+
+        currentData = currentData.concat(dateComeback);
+
+        currentRange = values;
+        update(currentData); 
+        updateChecks(); 
+        dateComeback = []
+
+      });
+
+      var legendWidth = 300; 
+      var legendHeight = 300;
+      var legend = d3.select("#legendDiv").append("svg").attr("width", legendWidth).attr("height", legendHeight); 
+
+      var domainValues = ["Unknown", "<$100,000", "$100,000 - $1,000,000", ">$1,000,000"];
+
+      legend.append('text').attr('x',5).attr('y', 16).style("font-weight", "bold").text("Color Scheme");
+
+      fillColor.range().forEach(function(color, i){
+          legend.append('rect').attr("width", 20).attr("height", 20).attr("x", 5).attr("y", 20 + i*25).style("fill", color);
+          legend.append('text').attr("x", 45).attr("y", 20 +5 + i*25).attr("alignment-baseline", "hanging").attr("text-anchor", "start").style("font-size", 16).text(domainValues[i]);
+      })
+
+    });
+
+  $(document).ready(function(){
+    $('[data-toggle="ttip"]').tooltip(); 
+  });
+  </script>
+
+
+
+</div>
+
+<script src="src/CustomTooltip.js"></script>
+<script src="data/test.js"></script>
+<script src="src/bubble_chart_script.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
