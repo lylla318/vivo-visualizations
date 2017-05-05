@@ -14,9 +14,30 @@ body {
   stroke-width: 0.7;
   stroke-linejoin: round;
   stroke-linecap: round;
- 
+  cursor:pointer;
 }
 
+.unlinked a{
+  color: white;
+  text-decoration: none;
+}
+
+
+.unlinked { 
+  color: white;
+  text-decoration: none;
+  margin-bottom: 0px;
+}
+
+.unlinked:hover{
+  text-decoration: none;
+}
+
+.unlinked a:hover{
+  color: white;
+  text-decoration: none;
+  margin-bottom: 0px;
+}
 
 .d3-tip {
   line-height: 1;
@@ -77,55 +98,49 @@ div.tooltip {
 
 #rh-panel {
   background-color: rgba(50, 50, 50, 0.8);
-  height: 95%;
+  height: 600px;
   width: 0%;
   float:right;
   transition: width .5s;
   position: absolute;
   right:0;
-  visibility: hidden;
 }
 
 #panel-icon {
-  font-size: 20px;
-  height: 10%;
-  width: 6%;
+  height: 100px;
+  width: 2%;
   float:right;
+  margin-right:3%;
+  margin-top:.5%;
   transition: width .5s;
   position: absolute;
   right:0;
-  margin-top:1.4%;
 }
 
-#offPanel {
-  color: #c0c0c0;
-}
 
-#onPanel {
-  visibility: hidden;
-}
 
 #hamburgerIcon{
-  font-size: 20px;
-  color: white;
+  font-size: 25px;
+  color: #C0C0C0;
   display:block;
   margin-left: 30px;
   float:left;
-  margin-left:4px;
-  margin-top: 15px;
+  margin-left:2px;
+  cursor:pointer;
 }
 
-#hamburgerIcon:hover{
-  cursor: pointer;
+.onPanel{
+  color:white !important;
 }
 
 #areaTitle{
   margin: 0;
-  margin-top:12px;
+  margin-top:0px;
   color: #FF0;
+  /*color:#ef7633*/
   float:left;
   margin-left: 5px;
-  font-size: 18pt;
+  font-size:18pt;
 }
 
 .list{
@@ -187,7 +202,6 @@ html{
   background-color: rgba(50, 50, 50, 0);
 }
 
-
 .rule{
   display: none;
 }
@@ -196,13 +210,13 @@ html{
   background-color: rgba(50, 150, 200, 1.0);
 }
 
+.linked{
+  margin-bottom: 0px;
+}
+
 .counts{
  float: right;
  color: white;
-}
-
-.linked{
-  margin-bottom: 0px;
 }
 
 .linked a{
@@ -210,37 +224,8 @@ html{
   text-decoration: none;
   margin-bottom: 0px;
 }
-
 .linked a:hover{
   text-decoration: underline;
-  
-}
-
-.unlinked a{
-  color: white;
-  text-decoration: none;
-}
-
-
-.unlinked { 
-  color: white;
-  text-decoration: none;
-  margin-bottom: 0px;
-}
-
-.unlinked:hover{
-  text-decoration: none;
-}
-
-.unlinked a:hover{
-  color: white;
-  text-decoration: none;
-  margin-bottom: 0px;
-}
-
-#bigCounts{
-  margin-left: 7px;
-  color: #FF0;
 }
 
 .normal{
@@ -249,23 +234,28 @@ html{
 }
 
 #nowShowing{
-  color: #212F3C;
+  color: steelBlue;
 }
 
 .listy:hover{
    background-color: rgba(50, 150, 200, .7);
    cursor: pointer;
-   color:white;
 }
 .listy{
-  font-weight: 300;
-  margin-bottom: 0px;
+  font-weight: 600;
 }
 #clear:hover{
   cursor: pointer;
 }
 #USA:hover{
   opacity: 1;
+}
+#nowShowing{
+  color: #212F3C;
+}
+#bigCounts{
+  margin-left: 7px;
+  color: #FF0;
 }
 
 .heading-travis{
@@ -280,4 +270,14 @@ html{
   color: white;
   display: inline-block;
   max-width: 70%;
+}
+
+.listy:hover{
+   background-color: rgba(50, 150, 200, .7);
+   cursor: pointer;
+   color:white;
+}
+.listy{
+  font-weight: 300;
+  margin-bottom: 0px;
 }
